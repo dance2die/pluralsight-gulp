@@ -25,6 +25,7 @@ gulp.task('styles', ['clean-styles'], function() {
 
     return gulp
         .src(config.less)
+        .pipe($.plumber())
         .pipe($.less())
         .pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
         .pipe(gulp.dest(config.temp));
@@ -39,6 +40,16 @@ gulp.task('less-watcher', function() {
     gulp.watch([config.less], ['styles']);
 });
 
+gulp.task('wiredep', function () {
+    var options = config.getWiredepDefaultOptions();
+    var wiredep = require('wiredep').stream;
+
+    return gulp
+        .src(config.index)
+        .pipe(wiredep(options))
+        .pipe($.inject(gulp.src(config.js)))
+        .pipe(gulp.dest(config.client));
+});
 
 //////////////
 
