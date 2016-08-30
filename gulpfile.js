@@ -4,6 +4,7 @@
 var gulp = require('gulp');
 var args = require('yargs').argv;
 var config = require('./gulp.config')();
+var del = require('del');
 
 var $ = require('gulp-load-plugins')({lazy: true});
 
@@ -19,7 +20,28 @@ gulp.task('vet', function(){
         .pipe($.jshint.reporter('fail'));
 });
 
+gulp.task('styles', ['clean-styles'], function() {
+    log('Compling Less --> CSS');
+
+    return gulp
+        .src(config.less)
+        .pipe($.less())
+        .pipe($.autoprefixer({browsers: ['last 2 version', '> 5%']}))
+        .pipe(gulp.dest(config.temp));
+});
+
+gulp.task('clean-styles', function (done){
+    var files = config.temp + '**/*.css';
+    clean(files, done);
+});
+
+
 //////////////
+
+function clean(paths, done) {
+    log('Cleaning: ' + $.util.colors.blue(paths));
+    del(paths, done);
+}
 
 function log(msg) {
     if (typeof(msg) === 'object') {
